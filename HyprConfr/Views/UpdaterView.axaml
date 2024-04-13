@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:HyprConfr.ViewModels"
+             x:DataType="vm:UpdaterViewModel"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="HyprConfr.Views.UpdaterView">
+    <Button Content="{Binding BtnTxt}" Padding="2" VerticalAlignment="Top" Command="{Binding Check}">
+        <Button.Flyout>
+            <Flyout>
+                <StackPanel MaxWidth="300" MinHeight="100">
+                    <TextBlock Padding="10" TextWrapping="WrapWithOverflow" Text="{Binding Result}"/>
+                    <ItemsControl ItemsSource="{Binding Releases}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel HorizontalAlignment="Stretch" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="5">
+                                    <Label Content="{Binding Tag}" FontSize="20" />
+                                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Padding="20,0,0,0" />
+                                    <!-- <ItemsControl ItemsSource="{Binding Assets}"> -->
+                                    <!--     <ItemsControl.ItemsPanel> -->
+                                    <!--         <ItemsPanelTemplate> -->
+                                    <!--             <StackPanel /> -->
+                                    <!--         </ItemsPanelTemplate> -->
+                                    <!--     </ItemsControl.ItemsPanel> -->
+                                    <!--     <ItemsControl.ItemTemplate> -->
+                                    <!--         <DataTemplate> -->
+                                    <!--             <Grid ColumnDefinitions="Auto"> -->
+                                    <!--                 <Button Background="#353535"> -->
+                                    <!--                     <StackPanel Orientation="Horizontal"> -->
+                                    <!--                         ~1~ <Label Content="Get"/> @1@ -->
+                                    <!--                         <Label Content="{Binding Name}"/> -->
+                                    <!--                     </StackPanel> -->
+                                    <!--                 </Button> -->
+                                    <!--             </Grid> -->
+                                    <!--         </DataTemplate> -->
+                                    <!--     </ItemsControl.ItemTemplate> -->
+                                    <!-- </ItemsControl> -->
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Flyout>
+        </Button.Flyout>
+    </Button>
+</UserControl>
