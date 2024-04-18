@@ -7,7 +7,7 @@
 
 ## Features (as of v0.1.0):
 ### Wallpaper manager
-⚠️ [Requires HyprPaper](https://github.com/hyprwm/hyprpaper) ⚠️
+⚠️ Requires [HyprPaper](https://github.com/hyprwm/hyprpaper) ⚠️
 * Supports multiple monitors
 * Uses `~/.config/hypr/hyprpaper.conf` file
 * Cleanly manages HyprPaper by preloading and unloading wallpapers so they don't clog memory
@@ -15,9 +15,12 @@
 
 ## CLI usage:
 Launching with any option will kill the app once it's done the thing
-                    -h  Prints this text
-                    -v  Prints version
-                    -wp Sets wallpapers according to hyprpaper.conf and runs HyprPaper
+
+  -h  Prints help text
+  
+  -v  Prints version
+  
+  -wp Sets wallpapers according to hyprpaper.conf and runs HyprPaper
                         
 Recommended to set `exec-once = /path/to/HyprConfr.AppImage -wp` in your hyprland.conf (or where you set autolaunch)
 HyprConfr will clean up HyprPaper by unloading the images once it's set up. 
