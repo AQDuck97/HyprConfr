@@ -19,8 +19,8 @@ public class WPManager
     {
         string preload = "";
         string papers = "";
-        MainManager.Kill("hyprpaper");
-        MainManager.BackRun("hyprpaper","");
+        Main.Kill("hyprpaper");
+        Main.BackRun("hyprpaper","");
 
         await Task.Delay(50);
 
@@ -35,12 +35,12 @@ public class WPManager
                 papers += $"\nwallpaper = {monitor.Name},{path}";
                 paths.Add(path);
 
-                await MainManager.RunAsync("hyprctl", $"hyprpaper preload \"{path}\"");
-                await MainManager.RunAsync("hyprctl", $"hyprpaper wallpaper \"{monitor.Name},{path}\"");
+                await Main.RunAsync("hyprctl", $"hyprpaper preload \"{path}\"");
+                await Main.RunAsync("hyprctl", $"hyprpaper wallpaper \"{monitor.Name},{path}\"");
             }
             catch (Exception e)
             {
-                MainManager.Log.Status = $"Failed to set wallpaper for {monitor.Name}: {e.Message}";
+                Main.Log.Status = $"Failed to set wallpaper for {monitor.Name}: {e.Message}";
             }
         }
         string confText = $"""
@@ -52,7 +52,7 @@ public class WPManager
         foreach (string path in paths)
         {
             await Task.Delay(100);
-            await MainManager.RunAsync("hyprctl", $"hyprpaper unload \"{path}\"");
+            await Main.RunAsync("hyprctl", $"hyprpaper unload \"{path}\"");
         }
     }
 
@@ -61,7 +61,7 @@ public class WPManager
         if (Monitors.Count < 1)
             Monitors = GetMonitors();
         
-        string file = $"/home/{Environment.UserName}/.config/hypr/hyprpaper.conf";
+        string file = $"{Main.Home}/.config/hypr/hyprpaper.conf";
         string source = $"~/Pictures/wallpapers";
         try
         {
@@ -78,16 +78,15 @@ public class WPManager
                 foreach (Monitor monitor in Monitors)
                 {
                     string wp = rawLines.Where(l => l.StartsWith(monitor.Name)).FirstOrDefault();
-                    wp = wp.Substring(wp.IndexOf(",") + 1, wp.Length - wp.IndexOf(",") - 1)
-                        .Replace("$HOME", $"/home/{Environment.UserName}");
+                    wp = Main.PathCheck(
+                        wp.Substring(wp.IndexOf(",") + 1, wp.Length - wp.IndexOf(",") - 1));
                     monitor.Wallpaper = new(wp);
                 }
-                // await MainManager.RunAsync("hyprctl", $"hyprpaper unload \"{path}\"");
             }
         }
         catch (Exception e)
         {
-            MainManager.Log.Status = $"Failed to read conf: {e.Message}";
+            Main.Log.Status = $"Failed to read conf: {e.Message}";
         }
 
         return source;
@@ -98,16 +97,14 @@ public class WPManager
         List<Wallpaper> bits = new();
         try
         {
-            foreach (string i in Directory.GetFiles(location
-                         .Replace("~", $"/home/{Environment.UserName}"))
-                         .Where(w => w.EndsWith(".png")))
+            foreach (string i in Directory.GetFiles(Main.PathCheck(location)).Where(w => w.EndsWith(".png")))
             {
                     bits.Add(new Wallpaper(i));
             }
         }
         catch (Exception e)
         {
-            MainManager.Log.Status = e.Message;
+            Main.Log.Status = e.Message;
         }
 
         return bits;

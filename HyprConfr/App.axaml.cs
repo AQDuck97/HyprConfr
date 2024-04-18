@@ -51,7 +51,7 @@ public partial class App : Application
             switch (arg)
             {
                 case "-v":
-                    Console.WriteLine($"HyprConfr {MainManager.Version()}");
+                    Console.WriteLine($"HyprConfr {Main.Version()}");
                     break;
                 case "-wp":
                     await WPManager.SetWallpapers(WPManager.ReadConf());
@@ -68,7 +68,7 @@ public partial class App : Application
     string Help()
     {
         return $"""
-                HyprConfr {MainManager.Version()}
+                HyprConfr {Main.Version()}
                 
                 Launching with any option will kill the app once it's done the thing
                     -h  Prints this text

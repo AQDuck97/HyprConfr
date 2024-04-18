@@ -9,11 +9,13 @@ public class Wallpaper
 {
     public string Path { get; set; }
     public Bitmap Bit { get; set; }
+    public Wallpaper WP { get; set; }
 
     public Wallpaper(string path)
     {
         Path = path;
         Bit = Img(path);
+        WP = this;
     }
 
     Bitmap Img(string path)
@@ -23,8 +25,8 @@ public class Wallpaper
         return Bitmap.DecodeToWidth(stream, 304, BitmapInterpolationMode.MediumQuality);
     }
 
-    public void Command()
-    {
-        WPManager.SelectedMonitor.Wallpaper = this;
-    }
+    // public void Command()
+    // {
+    //     WPManager.SelectedMonitor.Wallpaper = this;
+    // }
 }

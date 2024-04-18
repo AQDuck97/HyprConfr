@@ -4,18 +4,22 @@ using System.IO;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Avalonia.Controls;
+using Avalonia.Platform.Storage;
 using HyprConfr.Managers.Updater;
 using HyprConfr.Models;
 
 namespace HyprConfr.Managers;
 
-public class MainManager
+public class Main
 {
+    public static Window Win { get; set; }
     public static LogModel Log { get; set; } = new();
     public static ConfModel Conf { get; set; } = new();
     private static ReleaseManager _releaseManager = new();
     private static string _version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
     private static readonly string ConfFile = $"/home/{Environment.UserName}/.config/hyprconfr/config.json";
+    public static readonly string Home = $"/home/{Environment.UserName}";
 
     public static void OnLaunch()
     {
@@ -24,6 +28,17 @@ public class MainManager
         // CheckUpdate();
     }
 
+    public static string PathCheck(string path)
+    {
+        return path.Replace($"~", $"{Home}")
+            .Replace("$HOME", $"{Home}");
+    }
+    
+    public static string HomeCheck(string path)
+    {
+        return path.Replace($"{Home}", "~");
+    }
+    
     public static string Version()
     {
          return $"v{_version.Substring(0, _version.LastIndexOf("."))}";
@@ -146,5 +161,21 @@ public class MainManager
                           """;
         File.WriteAllText($"/home/{Environment.UserName}/.local/share/applications/hyprconfr.desktop", content);
         Log.Status = "Added .desktop file to ~/.local/share/applications";
+    }
+
+    public static async Task<string> DirPicker(string dir)
+    {
+        TopLevel top = TopLevel.GetTopLevel(Win);
+
+        FolderPickerOpenOptions options = new();
+        options.AllowMultiple = false;
+        options.SuggestedStartLocation = await top.StorageProvider.TryGetFolderFromPathAsync(new Uri(Home));
+
+        var folder = await top.StorageProvider.OpenFolderPickerAsync(options);
+
+        if (folder.Count > 0)
+            return folder[0].Path.ToString().Replace("file://", "");
+        
+        return dir;
     }
 }

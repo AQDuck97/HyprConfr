@@ -23,6 +23,17 @@ public class Monitor : INotifyPropertyChanged
     public string Make { get; set; }
     [JsonPropertyName("model")]
     public string Model { get; set; }
+
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            _isSelected = value;
+            OnPropertyChanged();
+        }
+    }
+    private bool _isSelected;
     public Wallpaper? Wallpaper
     {
         get { return _wallpaper; }
@@ -34,11 +45,6 @@ public class Monitor : INotifyPropertyChanged
     }
 
     private Wallpaper? _wallpaper;
-
-    public void Select()
-    {
-        WPManager.SelectedMonitor = this;
-    }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

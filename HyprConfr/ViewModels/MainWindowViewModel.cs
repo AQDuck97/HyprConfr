@@ -10,9 +10,9 @@ public class MainWindowViewModel : ViewModelBase
     private WallpaperViewModel _wpVM;
     public UpdaterViewModel UPVM { get; set; }
 
-    public bool DesktopExists => MainManager.CheckDesktop();
+    public bool DesktopExists => Main.CheckDesktop();
 
-    public LogModel Log => MainManager.Log;
+    public LogModel Log => Main.Log;
 
     public MainWindowViewModel()
     {

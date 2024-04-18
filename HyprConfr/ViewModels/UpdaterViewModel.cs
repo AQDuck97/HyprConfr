@@ -34,16 +34,16 @@ public class UpdaterViewModel : ViewModelBase
 
     public UpdaterViewModel()
     {
-        _url = MainManager.Conf.UpdateUrl;
+        _url = Main.Conf.UpdateUrl;
         _manager = new();
-        if(MainManager.Conf.AutoUpdate)
+        if(Main.Conf.AutoUpdate)
             Check();
     }
 
     public async void Check()
     {
-        BtnTxt = MainManager.Version();
-        Result = await Task.Run(() => _manager.CheckUpdates(_url, MainManager.Version()));
+        BtnTxt = Main.Version();
+        Result = await Task.Run(() => _manager.CheckUpdates(_url, Main.Version()));
         Releases = _manager.Releases;
     }
 }

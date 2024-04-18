@@ -20,7 +20,7 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel HorizontalAlignment="Center" Margin="1,0,1,0">
-                            <Button Command="{Binding Select}" HorizontalAlignment="Center" Padding="5"
+                            <ToggleButton IsChecked="{Binding IsSelected}" HorizontalAlignment="Center" Padding="5"
                                     Background="#202020">
                                 <Grid HorizontalAlignment="Center">
                                     <Image Source="{Binding Wallpaper.Bit}" Height="{Binding Height}"
@@ -28,7 +28,7 @@
                                     <Label HorizontalAlignment="Center" Content="{Binding Name}" />
                                     <Label HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="{Binding Model}" />
                                 </Grid>
-                            </Button>
+                            </ToggleButton>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
@@ -39,8 +39,9 @@
         <StackPanel Grid.Row="1">
             <Grid ColumnDefinitions="*,Auto" MaxWidth="700" Margin="20,0,20,0">
                 <TextBox Text="{Binding Location}" HorizontalAlignment="Stretch" />
-                <Button Grid.Column="1" Content="Set" Height="34" VerticalContentAlignment="Center" Padding="10,5,10,5"
-                        Command="{Binding Search}" HotKey="Enter" />
+                <Button Command="{Binding Search}" IsVisible="False" HotKey="Enter"/>
+                <Button Grid.Column="1" Content="Browse" Height="34" VerticalContentAlignment="Center" Padding="10,5,10,5"
+                        Command="{Binding Browse}" />
             </Grid>
         </StackPanel>
 
@@ -56,7 +57,8 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <StackPanel Width="304" HorizontalAlignment="Center" Margin="5">
-                                <Button Background="Transparent" Command="{Binding Command}">
+                                <Button Background="Transparent" CommandParameter="{Binding WP}"
+                                        Command="{Binding $parent[ItemsControl].((vm:WallpaperViewModel)DataContext).SetWp}">
                                     <Image Height="171" Width="304" Stretch="Fill" Source="{Binding Bit}" />
                                     <!-- <TextBlock Text="{Binding Path}" /> -->
                                 </Button>
