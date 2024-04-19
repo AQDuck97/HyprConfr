@@ -26,7 +26,7 @@ public class ConfModel : INotifyPropertyChanged
             OnPropertyChanged();
         }
     }
-    private string _updateUrl;
+    private string _updateUrl = "aqduck97/hyprconfr";
 
     public bool AutoUpdate
     {
