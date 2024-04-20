@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ public class Main
     public static ConfModel Conf { get; set; } = new();
     private static ReleaseManager _releaseManager = new();
     private static string _version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-    private static readonly string ConfFile = $"/home/{Environment.UserName}/.config/hyprconfr/config.json";
+    private static readonly string ConfPath = $"/home/{Environment.UserName}/.config/hyprconfr";
     public static readonly string Home = $"/home/{Environment.UserName}";
 
     public static void OnLaunch()
@@ -108,9 +109,9 @@ public class Main
     {
         try
         {
-            if (File.Exists(ConfFile))
+            if (File.Exists($"{ConfPath}/conf.json"))
             {
-                Conf = JsonSerializer.Deserialize<ConfModel>(File.ReadAllText(ConfFile));
+                Conf = JsonSerializer.Deserialize<ConfModel>(File.ReadAllText($"{ConfPath}/conf.json"));
                 Log.Status = "Loaded config";
             }
             else
@@ -126,14 +127,14 @@ public class Main
     {
         try
         {
-            DirCheck(ConfFile);
+            DirCheck($"{ConfPath}");
             Conf = confModel;
             JsonSerializerOptions options = new JsonSerializerOptions()
             {
                 WriteIndented = true
             };
             string content = JsonSerializer.Serialize(confModel, options);
-            File.WriteAllText(ConfFile, content);
+            File.WriteAllText($"{ConfPath}/conf.json", content);
         }
         catch (Exception e)
         {
@@ -141,7 +142,7 @@ public class Main
         }
     }
 
-    void DirCheck(string dir)
+    static void DirCheck(string dir)
     {
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);
@@ -149,18 +150,26 @@ public class Main
 
     public static void CreateDesktop()
     {
+        string appsDir = $"{Home}/.local/share/applications";
+        
+        string dir = Directory.GetCurrentDirectory();
+        string appName = $"{Directory.GetFiles(dir).FirstOrDefault(a => a.ToLower().Contains($"hyprconfr.app"))}";
+        
+        DirCheck(appsDir);
+        
         string content = $"""
                           [Desktop Entry]
                           Encoding=UTF-8
                           Version={_version}
                           Type=Application
                           Terminal=false
-                          Exec={Process.GetCurrentProcess().MainModule.FileName}
+                          Exec={appName}
+                          Icon={ConfPath}/hyprconfr.png
                           Name=HyprConfr
                           Description=Configuration tool for Hyprland
                           """;
-        File.WriteAllText($"/home/{Environment.UserName}/.local/share/applications/hyprconfr.desktop", content);
-        Log.Status = "Added .desktop file to ~/.local/share/applications";
+        File.WriteAllText($"{appsDir}/hyprconfr.desktop", content);
+        Log.Status = $"Added .desktop file to {HomeCheck(appsDir)}";
     }
 
     public static async Task<string> DirPicker(string dir)
