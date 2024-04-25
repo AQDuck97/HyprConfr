@@ -142,7 +142,7 @@ public class Main
         }
     }
 
-    static void DirCheck(string dir)
+    public static void DirCheck(string dir)
     {
         if (!Directory.Exists(dir))
             Directory.CreateDirectory(dir);

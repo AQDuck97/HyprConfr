@@ -5,22 +5,22 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using DynamicData;
 using HyprConfr.Models;
+using SixLabors.ImageSharp;
 
 namespace HyprConfr.Managers;
 
 public class WPManager
 {
     public static List<Monitor> Monitors { get; set; } = new();
-    public static Monitor? SelectedMonitor { get; set; }
+    private static readonly string _paperConf = $"{Main.Home}/.config/hypr/hyprpaper.conf";
 
     public static async Task SetWallpapers(string source)
     {
         string preload = "";
         string papers = "";
         Main.Kill("hyprpaper");
-        Main.BackRun("hyprpaper","");
+        Main.BackRun("hyprpaper", "");
 
         await Task.Delay(50);
 
@@ -30,7 +30,6 @@ public class WPManager
         {
             try
             {
-
                 string path = monitor.Wallpaper.Path.Replace($"/home/{Environment.UserName}", "$HOME");
                 papers += $"\nwallpaper = {monitor.Name},{path}";
                 paths.Add(path);
@@ -43,12 +42,13 @@ public class WPManager
                 Main.Log.Status = $"Failed to set wallpaper for {monitor.Name}: {e.Message}";
             }
         }
+
         string confText = $"""
                            #{source}
                            {papers}
                            """;
-        File.WriteAllText($"/home/{Environment.UserName}/.config/hypr/hyprpaper.conf", confText);
-        
+        File.WriteAllText(_paperConf, confText);
+
         foreach (string path in paths)
         {
             await Task.Delay(100);
@@ -61,13 +61,12 @@ public class WPManager
         if (Monitors.Count < 1)
             Monitors = GetMonitors();
         
-        string file = $"{Main.Home}/.config/hypr/hyprpaper.conf";
         string source = $"~/Pictures/wallpapers";
         try
         {
-            if (File.Exists(file))
+            if (File.Exists(_paperConf))
             {
-                string wpText = File.ReadAllText(file);
+                string wpText = File.ReadAllText(_paperConf);
                 source = wpText.Substring(1, wpText.IndexOf("\n") - 1);
 
                 int idx = wpText.IndexOf("wallpaper =");
@@ -91,15 +90,21 @@ public class WPManager
 
         return source;
     }
-    
+
     public static List<Wallpaper> GetImages(string location)
     {
         List<Wallpaper> bits = new();
         try
         {
-            foreach (string i in Directory.GetFiles(Main.PathCheck(location)).Where(w => w.EndsWith(".png")))
+            foreach (string i in Directory.GetFiles(Main.PathCheck(location)))
             {
-                    bits.Add(new Wallpaper(i));
+                string file = i;
+                if (!file.EndsWith(".png"))
+                {
+                    file = ConvertToPng(file, location);
+                }
+
+                bits.Add(new Wallpaper(file));
             }
         }
         catch (Exception e)
@@ -110,7 +115,31 @@ public class WPManager
         return bits;
     }
 
-    public static List<Monitor> GetMonitors()
+    private static string ConvertToPng(string file, string location)
+    {
+        string fName = Path.GetFileNameWithoutExtension(file);
+        string png = $"{location}/{fName}.png";
+        
+        if (!File.Exists(png))
+        {
+            string target = $"{location}/jpegs";
+            string targetFile = $"{target}/{Path.GetFileName(file)}";
+            var stream = File.OpenRead(file);
+            
+            Image img = Image.Load(stream);
+            img.SaveAsPng(png);
+            
+            Main.DirCheck(target);
+            if(!File.Exists(targetFile))
+                File.Move(file, targetFile);
+            else
+                File.Delete(file);
+        }
+
+        return png;
+    }
+
+    private static List<Monitor> GetMonitors()
     {
         List<Monitor> monitors = new();
         ProcessStartInfo psi = new()
@@ -122,10 +151,10 @@ public class WPManager
             RedirectStandardOutput = true,
             RedirectStandardError = true
         };
-        
+
         Process proc = Process.Start(psi);
         proc.WaitForExit();
-        
+
         string json = proc.StandardOutput.ReadToEnd();
 
         monitors = JsonSerializer.Deserialize<List<Monitor>>(json);
@@ -141,7 +170,7 @@ public class WPManager
             int idx = make.Length;
             if (make.Contains(" "))
                 idx = make.IndexOf(" ");
-            // monitor.Wallpaper = _wallpapers.FirstOrDefault();
+            
             monitor.Height /= 10;
             monitor.Width /= 10;
             monitor.Model = $"{make.Substring(0, idx)} {monitor.Model}";
