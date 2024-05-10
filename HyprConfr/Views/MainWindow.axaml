@@ -19,10 +19,23 @@
                 <Label Content="HyprConfr - Wallpaper" Height="50" FontSize="25" VerticalContentAlignment="Center" />
             </StackPanel>
             <StackPanel HorizontalAlignment="Right" Orientation="Horizontal">
-                <view:UpdaterView DataContext="{Binding UPVM}"/>
+                <view:UpdaterView DataContext="{Binding UPVM}" />
             </StackPanel>
         </Grid>
 
         <view:WallpaperView Grid.Row="1" DataContext="{Binding WPVM}" />
+
+        <!-- Status bar -->
+        <Grid Grid.Row="2" Background="#252525">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Orientation="Horizontal">
+                <ScrollViewer MaxHeight="50">
+                    <TextBlock Text="{Binding Log.Status}" />
+                </ScrollViewer>
+                <Button IsVisible="{Binding !!Log.Status}" Content="Dismiss" Foreground="Red" VerticalAlignment="Top"
+                        Command="{Binding Dismiss}" />
+            </StackPanel>
+            <Button Content="Add .desktop file" Padding="5" HorizontalAlignment="Left" Command="{Binding AddDesktop}"
+                    IsVisible="{Binding !DesktopExists}" />
+        </Grid>
     </Grid>
 </Window>

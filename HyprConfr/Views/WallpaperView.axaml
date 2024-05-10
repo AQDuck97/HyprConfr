@@ -14,33 +14,47 @@
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel HorizontalAlignment="Center" />
-                        <!-- <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" /> -->
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel HorizontalAlignment="Center" Margin="1,0,1,0">
+                        <StackPanel HorizontalAlignment="Center" Margin="1,0,1,0" VerticalAlignment="Stretch">
+                            <ToggleButton HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                          Padding="0"
+                                          VerticalAlignment="Bottom" Background="#202020"
+                                          IsChecked="{Binding RandomizeWP}">
+                                <StackPanel>
+                                    <Label Margin="0" Content="Set random on login" />
+                                </StackPanel>
+                            </ToggleButton>
                             <ToggleButton IsChecked="{Binding IsSelected}" HorizontalAlignment="Center" Padding="5"
-                                    Background="#202020">
+                                          Background="#202020">
                                 <Grid HorizontalAlignment="Center">
                                     <Image Source="{Binding Wallpaper.Bit}" Height="{Binding Height}"
                                            Width="{Binding Width}" Stretch="Fill" />
-                                    <Label HorizontalAlignment="Center" Content="{Binding Name}" />
-                                    <Label HorizontalAlignment="Center" VerticalAlignment="Bottom" Content="{Binding Model}" />
+                                    <Label HorizontalAlignment="Center" Content="{Binding Name}"
+                                           VerticalAlignment="Top" />
+                                    <Label HorizontalAlignment="Center" Content="{Binding Model}"
+                                           VerticalAlignment="Bottom" />
                                 </Grid>
                             </ToggleButton>
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Random" Background="#202020" Padding="5" Command="{Binding Random}" />
+                <Button Content="Apply" Background="#202020" Padding="5" Command="{Binding Set}" />
+            </StackPanel>
         </StackPanel>
 
         <!-- Search bar -->
-        <StackPanel Grid.Row="1">
+        <StackPanel Grid.Row="1" Margin="5">
             <Grid ColumnDefinitions="*,Auto" MaxWidth="700" Margin="20,0,20,0">
                 <TextBox Text="{Binding Location}" HorizontalAlignment="Stretch" />
-                <Button Command="{Binding Search}" IsVisible="False" HotKey="Enter"/>
-                <Button Grid.Column="1" Content="Browse" Height="34" VerticalContentAlignment="Center" Padding="10,5,10,5"
+                <Button Command="{Binding Search}" IsVisible="False" HotKey="Enter" />
+                <Button Grid.Column="1" Content="Browse" Height="34" VerticalContentAlignment="Center"
+                        Padding="10,5,10,5"
                         Command="{Binding Browse}" />
             </Grid>
         </StackPanel>
@@ -51,7 +65,7 @@
                 <ItemsControl ItemsSource="{Binding Wallpapers}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
-                            <WrapPanel HorizontalAlignment="Center" Background="#252525" />
+                            <WrapPanel HorizontalAlignment="Center" />
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
@@ -69,12 +83,5 @@
             </Grid>
         </ScrollViewer>
 
-        <!-- Status bar -->
-        <Grid Grid.Row="3" Background="#252525">
-            <Button Content="Apply" Padding="5" HorizontalAlignment="Right" Command="{Binding Set}" />
-            <TextBlock Text="{Binding Log.Status}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <Button Content="Add .desktop file" Padding="5" HorizontalAlignment="Left" Command="{Binding AddDesktop}"
-                    IsVisible="{Binding !DesktopExists}" />
-        </Grid>
     </Grid>
 </UserControl>

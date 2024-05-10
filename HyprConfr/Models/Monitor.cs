@@ -24,6 +24,17 @@ public class Monitor : INotifyPropertyChanged
     [JsonPropertyName("model")]
     public string Model { get; set; }
 
+    public bool RandomizeWP
+    {
+        get => _rndWP;
+        set
+        {
+            _rndWP = value;
+            OnPropertyChanged();
+        }
+    }
+    private bool _rndWP;
+
     public bool IsSelected
     {
         get => _isSelected;

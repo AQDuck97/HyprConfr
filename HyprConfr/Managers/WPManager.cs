@@ -13,6 +13,7 @@ namespace HyprConfr.Managers;
 public class WPManager
 {
     public static List<Monitor> Monitors { get; set; } = new();
+    public static List<Wallpaper> Wallpapers = new();
     private static readonly string _paperConf = $"{Main.Home}/.config/hypr/hyprpaper.conf";
 
     public static async Task SetWallpapers(string source)
@@ -31,7 +32,15 @@ public class WPManager
             try
             {
                 string path = monitor.Wallpaper.Path.Replace($"/home/{Environment.UserName}", "$HOME");
-                papers += $"\nwallpaper = {monitor.Name},{path}";
+
+                string sPath = path;
+
+                if (monitor.RandomizeWP)
+                {
+                    sPath += "#random";
+                }
+                
+                papers += $"\nwallpaper = {monitor.Name},{sPath}";
                 paths.Add(path);
 
                 await Main.RunAsync("hyprctl", $"hyprpaper preload \"{path}\"");
@@ -60,10 +69,11 @@ public class WPManager
     {
         if (Monitors.Count < 1)
             Monitors = GetMonitors();
-        
+
         string source = $"~/Pictures/wallpapers";
         try
         {
+            string[] rawLines = {""};
             if (File.Exists(_paperConf))
             {
                 string wpText = File.ReadAllText(_paperConf);
@@ -72,15 +82,24 @@ public class WPManager
                 int idx = wpText.IndexOf("wallpaper =");
 
                 wpText = wpText.Substring(idx, wpText.Length - idx).Replace("wallpaper = ", "");
-                string[] rawLines = wpText.Split("\n");
+                rawLines = wpText.Split("\n");
 
-                foreach (Monitor monitor in Monitors)
-                {
-                    string wp = rawLines.Where(l => l.StartsWith(monitor.Name)).FirstOrDefault();
-                    wp = Main.PathCheck(
-                        wp.Substring(wp.IndexOf(",") + 1, wp.Length - wp.IndexOf(",") - 1));
-                    monitor.Wallpaper = new(wp);
-                }
+            } 
+            
+            GetImages(source);
+            
+            foreach (Monitor monitor in Monitors)
+            {
+                string wp = rawLines.Where(l => l.StartsWith(monitor.Name)).FirstOrDefault();
+                string path = wp.Substring(wp.IndexOf(",") + 1, wp.Length - wp.IndexOf(",") - 1).Replace("#random", "");
+                
+                if (wp.ToLower().Contains("#random"))
+                    monitor.RandomizeWP = true;
+                
+                if (string.IsNullOrEmpty(path))
+                    monitor.Wallpaper = Randomize();
+                
+                monitor.Wallpaper = new(Main.PathCheck(path));
             }
         }
         catch (Exception e)
@@ -91,9 +110,14 @@ public class WPManager
         return source;
     }
 
+    public static Wallpaper Randomize()
+    {
+        return new(Wallpapers[new Random().Next(0,Wallpapers.Count)].Path);
+    }
+
     public static List<Wallpaper> GetImages(string location)
     {
-        List<Wallpaper> bits = new();
+        Wallpapers = new();
         try
         {
             foreach (string i in Directory.GetFiles(Main.PathCheck(location)))
@@ -104,7 +128,7 @@ public class WPManager
                     file = ConvertToPng(file, location);
                 }
 
-                bits.Add(new Wallpaper(file));
+                Wallpapers.Add(new Wallpaper(file));
             }
         }
         catch (Exception e)
@@ -112,25 +136,25 @@ public class WPManager
             Main.Log.Status = e.Message;
         }
 
-        return bits;
+        return Wallpapers;
     }
 
     private static string ConvertToPng(string file, string location)
     {
         string fName = Path.GetFileNameWithoutExtension(file);
         string png = $"{location}/{fName}.png";
-        
+
         if (!File.Exists(png))
         {
             string target = $"{location}/jpegs";
             string targetFile = $"{target}/{Path.GetFileName(file)}";
             var stream = File.OpenRead(file);
-            
+
             Image img = Image.Load(stream);
             img.SaveAsPng(png);
-            
+
             Main.DirCheck(target);
-            if(!File.Exists(targetFile))
+            if (!File.Exists(targetFile))
                 File.Move(file, targetFile);
             else
                 File.Delete(file);
@@ -170,7 +194,7 @@ public class WPManager
             int idx = make.Length;
             if (make.Contains(" "))
                 idx = make.IndexOf(" ");
-            
+
             monitor.Height /= 10;
             monitor.Width /= 10;
             monitor.Model = $"{make.Substring(0, idx)} {monitor.Model}";

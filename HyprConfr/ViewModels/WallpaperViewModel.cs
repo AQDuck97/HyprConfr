@@ -19,7 +19,7 @@ public class WallpaperViewModel : ViewModelBase
 
     public List<Wallpaper> Wallpapers
     {
-        get => _wallpapers;
+        get => WPManager.Wallpapers;
         set => this.RaiseAndSetIfChanged(ref _wallpapers, value);
     }
     private List<Wallpaper> _wallpapers;
@@ -38,21 +38,24 @@ public class WallpaperViewModel : ViewModelBase
     }
     private string _location;
 
-    public bool DesktopExists
-    {
-        get => _desktopExists;
-        set => this.RaiseAndSetIfChanged(ref _desktopExists, value);
-    }
-    private bool _desktopExists;
-    
-    public LogModel Log => Main.Log;
-
     public WallpaperViewModel()
     {
         _location = WPManager.ReadConf();
         _wallpapers = WPManager.GetImages(_location);
         WPManager.SetMonitors();
-        DesktopExists = Main.CheckDesktop();
+    }
+
+    public void Random()
+    {
+        foreach (Monitor monitor in Monitors.Where(m => m.IsSelected))
+        {
+            monitor.Wallpaper = WPManager.Randomize();
+        }
+    }
+
+    public async void Set()
+    {
+        await WPManager.SetWallpapers(_location);
     }
 
     public void Search()
@@ -71,17 +74,6 @@ public class WallpaperViewModel : ViewModelBase
         {
             mon.Wallpaper = wp;
         }
-    }
-
-    public async void Set()
-    {
-        await WPManager.SetWallpapers(_location);
-    }
-
-    public void AddDesktop()
-    {
-        Main.CreateDesktop();
-        DesktopExists = Main.CheckDesktop();
     }
 
     string HomeCheck(string text)
