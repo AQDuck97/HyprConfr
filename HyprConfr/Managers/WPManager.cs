@@ -38,6 +38,7 @@ public class WPManager
                 if (monitor.RandomizeWP)
                 {
                     sPath += "#random";
+                    path = Randomize().Path;
                 }
                 
                 papers += $"\nwallpaper = {monitor.Name},{sPath}";
